@@ -8,73 +8,77 @@ import org.json.simple.JSONObject;
 
 public class JsonCreator {
 
-    public static JSONObject createParent(JSONObject jsonObject,String key, String value) {
-	jsonObject.put(key, value);
-	return jsonObject;
-    }
-    
-    public static JSONArray createJsonList(List list){
-	
-	JSONArray jsonlist = new JSONArray();
-	for(int i=0; i<list.size(); i++){
-	    jsonlist.add(list.get(i));
-	}
-	return jsonlist;
-    }
-    
-    public static JSONObject createChild(JSONObject parentObject, String property,  JSONArray arrayList) {
-	
-	parentObject.put(property, arrayList);
-   	return parentObject;
-   	
-       }
-       
-    
-
-    public static void main(String[] args) {
-	JSONObject mainObject = new JSONObject();
-	
-	mainObject = createParent(mainObject,"id", "1");
-	mainObject = createParent(mainObject,"text", "Foods");
-	mainObject = createParent(mainObject,"state", "closed");
-	
-	
-	
-	
-	JSONObject obj = new JSONObject();
-	obj.put("name", "mkyong.com");
-	obj.put("age", new Integer(100));
-
-	JSONObject childObjec = new JSONObject();
-	childObjec.put("id", 2);
-	childObjec.put("text", "Vegetables");
-	childObjec.put("state", "open");
-
-	JSONObject childObjec3 = new JSONObject();
-	childObjec3.put("id", 3);
-	childObjec3.put("text", "Fruits");
-	childObjec3.put("state", "closed");
-
-	JSONArray list = new JSONArray();
-	list.add(childObjec);
-	list.add(childObjec3);
-	list.add("msg 3");
-
-	obj.put("messages", list);
-
-	try {
-
-	    FileWriter file = new FileWriter("c:\\test.json");
-	    file.write(obj.toJSONString());
-	    file.flush();
-	    file.close();
-
-	} catch (IOException e) {
-	    e.printStackTrace();
+	public static JSONObject createNode(JSONObject jsonObject, String key, String value) {
+		jsonObject.put(key, value);
+		return jsonObject;
 	}
 
-	System.out.print(obj);
+	public static JSONArray getChildNodeInArray(JSONObject... objs) {
 
-    }
+		JSONArray jsonlist = new JSONArray();
+		for(JSONObject obj : objs)
+			jsonlist.add(obj);
+		
+		return jsonlist;
+	}
+
+	public static JSONObject createChildNode(JSONObject parentObject, String property, JSONArray arrayList) {
+
+		parentObject.put(property, arrayList);
+		return parentObject;
+
+	}
+
+	public static void main(String[] args) {
+		JSONObject rootObject = new JSONObject();
+
+		
+		rootObject = createNode(rootObject, "text", "Root");
+		rootObject = createNode(rootObject, "state", "open");
+		
+		
+		JSONObject childNode = new JSONObject();
+		childNode = createNode(childNode, "text", "Fruits");
+		childNode = createNode(childNode, "state", "closed");
+		
+		
+		//=========== leafs ==============================
+		JSONObject leaf1 = new JSONObject();
+		leaf1 = createNode(leaf1, "text", "apple");
+		leaf1 = createNode(leaf1, "checked", "false");
+		
+		JSONObject leaf2 = new JSONObject();
+		leaf2 = createNode(leaf2, "text", "banna");
+		leaf2= createNode(leaf2, "checked", "false");
+		
+		JSONArray list = getChildNodeInArray(leaf1, leaf2);
+		//===============================================
+		
+		
+		
+		JSONObject firstNode = createChildNode(childNode,"children",list);
+		list = getChildNodeInArray(firstNode);
+		
+		JSONObject resultJson = createChildNode(rootObject, "children", list);
+		
+		
+		JSONArray resultJSONList = new JSONArray();
+		resultJSONList.add(resultJson);
+		
+	
+		try {
+
+			FileWriter file = new FileWriter("c:\\test.json");
+			file.write(resultJSONList.toJSONString());
+			file.flush();
+			file.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.print(resultJson);
+
+	}
 
 }
